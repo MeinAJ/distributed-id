@@ -6,11 +6,13 @@ package com.geega.bsc.id.common.constant;
  */
 public class ZkTreeConstant {
 
-    public static final String ZK_SERVER_ROOT = "/distributed/id/server";
+    private static final String ZK_ROOT = "/distributed/id";
 
-    public static final String ZK_WORK_ID_ROOT = "/distributed/id/workid";
+    public static final String ZK_SERVER_ROOT = ZK_ROOT + "/server";
 
-    public static final String ZK_CLIENT_ROOT = "/distributed/id/client";
+    public static final String ZK_WORK_ID_ROOT = ZK_ROOT + "/workid";
+
+    public static final String ZK_CLIENT_ROOT = ZK_ROOT + "/client";
 
     public static final String ZK_PATH_SEPARATOR = "/";
 

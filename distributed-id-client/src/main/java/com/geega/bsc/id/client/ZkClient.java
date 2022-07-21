@@ -12,6 +12,7 @@ import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.cache.PathChildrenCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.util.List;
 
 /**
@@ -39,13 +40,18 @@ public class ZkClient {
         return this.nodesInformation.getNodes();
     }
 
+
     private void start() {
         try {
-
             //创建zk客户端
             final ZookeeperFactory factory = new ZookeeperFactory(this.zkConfig);
             final CuratorFramework zkClient = factory.instance();
 
+            initBaseNode(zkClient);
+
+            if (zkClient.checkExists().forPath(ZkTreeConstant.ZK_SERVER_ROOT) == null) {
+                zkClient.create().forPath(ZkTreeConstant.ZK_SERVER_ROOT);
+            }
             //获取当前已注册服务
             final List<String> zkNodePaths = zkClient.getChildren().forPath(ZkTreeConstant.ZK_SERVER_ROOT);
             LOGGER.info("当前已注册服务节点：{}", JSON.toJSONString(zkNodePaths));
@@ -84,6 +90,39 @@ public class ZkClient {
         } catch (Exception e) {
             LOGGER.error("初始化zk失败", e);
             throw new RuntimeException("初始化zk失败");
+        }
+    }
+
+    /**
+     * 初始化基础节点
+     *
+     * @param zkClient
+     * @throws Exception
+     */
+    private void initBaseNode(CuratorFramework zkClient) throws Exception {
+        createNodeIfNotExist(zkClient, ZkTreeConstant.ZK_SERVER_ROOT);
+        createNodeIfNotExist(zkClient, ZkTreeConstant.ZK_CLIENT_ROOT);
+        createNodeIfNotExist(zkClient, ZkTreeConstant.ZK_WORK_ID_ROOT);
+    }
+
+    /**
+     * 如果没有节点就创建节点
+     *
+     * @param zkClient
+     * @param nodePath
+     * @throws Exception
+     */
+    private void createNodeIfNotExist(CuratorFramework zkClient, String nodePath) throws Exception {
+        String[] paths = nodePath.split(ZkTreeConstant.ZK_PATH_SEPARATOR);
+        String createPath = "";
+        for (String path : paths) {
+            if ("".equals(path)) {
+                continue;
+            }
+            createPath += ZkTreeConstant.ZK_PATH_SEPARATOR + path;
+            if (zkClient.checkExists().forPath(createPath) == null) {
+                zkClient.create().forPath(createPath);
+            }
         }
     }
 
