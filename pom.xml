@@ -14,6 +14,7 @@
         <module>distributed-id-common</module>
         <module>id-spring-boot-starter</module>
         <module>id-server</module>
+        <module>distributed-id-zk-common</module>
     </modules>
 
     <properties>
@@ -23,14 +24,44 @@
         <!--lombok-->
         <lombok.version>1.18.24</lombok.version>
         <spring.boot.version>2.2.7.RELEASE</spring.boot.version>
+        <curator.version>5.2.1</curator.version>
+        <fastjson.version>2.0.7.graal</fastjson.version>
+        <hutool.version>5.8.3</hutool.version>
     </properties>
 
     <!--通用依赖,每个子模块都会有这些依赖-->
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <!--curator 依赖-->
+            <dependency>
+                <groupId>org.apache.curator</groupId>
+                <artifactId>curator-recipes</artifactId>
+                <version>${curator.version}</version>
+            </dependency>
+            <!--fastjson序列化-->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>fastjson</artifactId>
+                <version>${fastjson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.hutool</groupId>
+                <artifactId>hutool-all</artifactId>
+                <version>${hutool.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>${lombok.version}</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

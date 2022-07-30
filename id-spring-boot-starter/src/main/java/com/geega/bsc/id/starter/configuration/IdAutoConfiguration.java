@@ -7,9 +7,9 @@ package com.geega.bsc.id.starter.configuration;
 
 import com.geega.bsc.id.client.IdClient;
 import com.geega.bsc.id.client.cache.CacheConfig;
-import com.geega.bsc.id.common.config.ZkConfig;
 import com.geega.bsc.id.starter.properties.CacheProperties;
 import com.geega.bsc.id.starter.properties.ZkProperties;
+import com.geega.bsc.id.zk.common.config.ZkConfig;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

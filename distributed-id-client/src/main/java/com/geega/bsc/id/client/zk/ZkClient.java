@@ -2,15 +2,16 @@ package com.geega.bsc.id.client.zk;
 
 import com.geega.bsc.id.client.node.NodesInformation;
 import com.geega.bsc.id.common.address.NodeAddress;
-import com.geega.bsc.id.common.config.ZkConfig;
-import com.geega.bsc.id.common.constant.ZkTreeConstant;
 import com.geega.bsc.id.common.exception.DistributedIdException;
-import com.geega.bsc.id.common.factory.ZookeeperFactory;
 import com.geega.bsc.id.common.utils.TimeUtil;
+import com.geega.bsc.id.zk.common.config.ZkConfig;
+import com.geega.bsc.id.zk.common.constant.ZkTreeConstant;
+import com.geega.bsc.id.zk.common.factory.CustomZookeeperFactory;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.cache.PathChildrenCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.util.List;
 
 /**
@@ -39,7 +40,7 @@ public class ZkClient {
         try {
 
             //创建zk客户端
-            final ZookeeperFactory factory = new ZookeeperFactory(this.zkConfig);
+            final CustomZookeeperFactory factory = new CustomZookeeperFactory(this.zkConfig);
             final CuratorFramework zkClient = factory.instance();
 
             //获取当前已注册服务

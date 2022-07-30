@@ -134,6 +134,7 @@ public class IdProcessor {
 
         @Override
         public void run() {
+            System.out.println("connectionState:"+connectionState);
             while (connectionState == 1) {
                 try {
                     //监听操作系统是否有事件，事件来时，操作系统回调函数，让你阻塞状态唤醒
