@@ -1,71 +1,64 @@
 package com.geega.bsc.id.client.network;
 
-import com.geega.bsc.id.client.IdClient;
-import com.geega.bsc.id.client.zk.ZkClient;
 import com.geega.bsc.id.common.address.NodeAddress;
 import com.geega.bsc.id.common.exception.DistributedIdException;
 import com.geega.bsc.id.common.utils.AddressUtil;
 import lombok.extern.slf4j.Slf4j;
-import java.util.List;
+
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * 处理器分配
+ * 处理器工厂
  *
  * @author Jun.An3
  * @date 2022/07/18
  */
 @Slf4j
-public class IdProcessorDispatch {
-
-    private final ZkClient zkClient;
-
-    private final IdClient generator;
+public class IdProcessorFactory {
 
     private volatile IdProcessor currentProcessor;
 
     private final AtomicInteger id = new AtomicInteger(1);
 
-    public IdProcessorDispatch(ZkClient zkClient, IdClient generator) {
-        this.zkClient = zkClient;
-        this.generator = generator;
+    private NodeAddressDispatch nodeAddressDispatch;
+
+    //最多一个连接取数据的次数
+    private final static int MAX_TIMES_FETCH_PER_NODE = 10;
+
+    private final AtomicInteger nodeFetchTimes = new AtomicInteger(0);
+
+    public IdProcessorFactory(NodeAddressDispatch address) {
+        this.nodeAddressDispatch = address;
     }
 
-    public IdProcessor dispatch() {
-        if (currentProcessor != null && currentProcessor.isValid()) {
+    public IdProcessor create() {
+        if (currentProcessor != null && currentProcessor.isValid() && nodeFetchTimes.getAndIncrement() <= MAX_TIMES_FETCH_PER_NODE) {
             log.info("使用连接：[{}]", AddressUtil.getConnectionId(currentProcessor.getSocketChannel()));
             return currentProcessor;
         }
-        checkClose();
-        innerDispatch();
+        closeCurrentProcess();
+        innerCreate();
         return currentProcessor;
     }
 
-    private void innerDispatch() {
+    private void innerCreate() {
         if (currentProcessor == null || !currentProcessor.isValid()) {
             synchronized (this) {
                 if (currentProcessor == null || !currentProcessor.isValid()) {
-                    List<NodeAddress> nodes = zkClient.getNodes();
-                    if (nodes.isEmpty()) {
-                        throw new DistributedIdException("无可用服务");
-                    }
-                    NodeAddress nodeAddress = null;
-                    for (NodeAddress node : nodes) {
-                        nodeAddress = node;
-                        break;
-                    }
+                    NodeAddress nodeAddress = nodeAddressDispatch.dispatchNodeAddress();
                     if (nodeAddress == null) {
                         throw new DistributedIdException("无可用服务");
                     }
-                    currentProcessor = new IdProcessor(String.valueOf(id.getAndIncrement()), generator, nodeAddress);
+                    currentProcessor = new IdProcessor(String.valueOf(id.getAndIncrement()), nodeAddress);
+                    nodeFetchTimes.set(0);
                 }
             }
         }
     }
 
-    private void checkClose() {
+    private void closeCurrentProcess() {
         synchronized (this) {
-            if (this.currentProcessor != null && !this.currentProcessor.isValid()) {
+            if (this.currentProcessor != null) {
                 this.currentProcessor.close();
                 //help gc
                 this.currentProcessor = null;

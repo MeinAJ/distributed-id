@@ -1,7 +1,6 @@
 package com.geega.bsc.id.client.network;
 
 import com.alibaba.fastjson.JSON;
-import com.geega.bsc.id.client.IdClient;
 import com.geega.bsc.id.common.address.NodeAddress;
 import com.geega.bsc.id.common.exception.DistributedIdException;
 import com.geega.bsc.id.common.network.DistributedIdChannel;
@@ -11,17 +10,14 @@ import com.geega.bsc.id.common.utils.AddressUtil;
 import com.geega.bsc.id.common.utils.ByteBufferUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -34,8 +30,6 @@ public class IdProcessor {
     private static final Logger LOGGER = LoggerFactory.getLogger(IdProcessor.class);
 
     private final String id;
-
-    private final IdClient generator;
 
     private DistributedIdChannel distributedIdChannel;
 
@@ -54,11 +48,13 @@ public class IdProcessor {
 
     private SocketChannel socketChannel;
 
-    public IdProcessor(String id, IdClient generator, NodeAddress nodeAddress) {
+    private List<Long> ids;
+
+    public IdProcessor(String id, NodeAddress nodeAddress) {
         this.id = id;
-        this.generator = generator;
         this.completedReceives = new ArrayList<>();
         this.stagedReceives = new ArrayDeque<>();
+        this.ids = new ArrayList<>();
         this.init(nodeAddress.getIp(), nodeAddress.getPort());
         //noinspection AlibabaThreadPoolCreation
         this.executorService = Executors.newSingleThreadExecutor(r -> {
@@ -134,7 +130,7 @@ public class IdProcessor {
 
         @Override
         public void run() {
-            System.out.println("connectionState:"+connectionState);
+            System.out.println("connectionState:" + connectionState);
             while (connectionState == 1) {
                 try {
                     //监听操作系统是否有事件，事件来时，操作系统回调函数，让你阻塞状态唤醒
@@ -185,7 +181,7 @@ public class IdProcessor {
         } catch (Exception ignored) {
             //do nothing
         } finally {
-            LOGGER.warn("关闭连接：{}", distributedIdChannel.socketDescription());
+            LOGGER.warn("关闭连接：{},地址:{}", distributedIdChannel.socketDescription(),distributedIdChannel.socketAddress().getHostAddress());
         }
     }
 
@@ -222,11 +218,20 @@ public class IdProcessor {
                 iterator.remove();
                 String idsJsonString = ByteBufferUtil.byteBufferToString(payload);
                 if (idsJsonString != null && idsJsonString.length() > 0) {
-                    List<Long> ids = JSON.parseArray(idsJsonString, Long.class);
-                    generator.cache(ids);
+                   this.ids = JSON.parseArray(idsJsonString, Long.class);
+//                    this.ids = ids;
+//                    generator.cache(ids);
                 }
             }
         }
+    }
+
+    public List<Long> getIds(){
+        return ids;
+    }
+
+    public void clearIds(){
+        this.ids.clear();
     }
 
     private void addToCompletedReceives() {

@@ -40,6 +40,7 @@ public class IdServer {
         //请求处理器
         ServerRequestHandler requestHandler = new ServerRequestHandler(requestChannel, new SnowFlake(serverConfig.getIdDatacenter(), MachineIdSpi.getMachineId()));
         requestHandler.start();
+        log.info("服务启动,{}:{}",serverConfig.getIp(),serverConfig.getPort());
         //启动后做一些事，用于拓展
         doAfterStart();
         //hold住

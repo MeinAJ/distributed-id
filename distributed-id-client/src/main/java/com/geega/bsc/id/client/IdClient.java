@@ -1,13 +1,14 @@
 package com.geega.bsc.id.client;
 
 import com.geega.bsc.id.client.cache.CacheConfig;
-import com.geega.bsc.id.client.network.IdProcessorDispatch;
-import com.geega.bsc.id.client.zk.ZkClient;
-import com.geega.bsc.id.zk.common.config.ZkConfig;
+import com.geega.bsc.id.client.network.IdProcessor;
+import com.geega.bsc.id.client.network.IdProcessorFactory;
+import com.geega.bsc.id.client.network.NodeAddressDispatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -34,17 +35,24 @@ public class IdClient {
 
     private final ExecutorService executorService;
 
-    private final IdProcessorDispatch processorDispatch;
+    private final NodeAddressDispatch processorDispatch;
 
     private final AtomicBoolean isExpanding = new AtomicBoolean(false);
 
-    public IdClient(ZkConfig zkConfig, CacheConfig cacheConfig) {
+    private IdProcessorFactory idProcessorFactory;
+
+
+    public IdClient(NodeAddressDispatch dispatch, CacheConfig cacheConfig) {
         this.capacity = cacheConfig.getCapacity();
         this.trigger = cacheConfig.getTriggerExpand();
+
         this.expandNum = capacity - trigger;
-        assert expandNum > 0;
+        if (expandNum < 0) {
+            throw new IllegalArgumentException("capacity 必须大于 trigger expand");
+        }
         this.idQueue = new LinkedBlockingQueue<>(this.capacity);
-        this.processorDispatch = new IdProcessorDispatch(new ZkClient(zkConfig), this);
+        this.processorDispatch = dispatch;
+        idProcessorFactory = new IdProcessorFactory(processorDispatch);
         //noinspection AlibabaThreadPoolCreation
         this.executorService = Executors.newSingleThreadExecutor(r -> {
             Thread thread = new Thread(r, "Get-Id-Schedule");
@@ -102,7 +110,9 @@ public class IdClient {
 
     private void executeOnceSync(int num) {
         try {
-            this.processorDispatch.dispatch().poll(num);
+            IdProcessor idProcessor = this.idProcessorFactory.create();
+            idProcessor.poll(num);
+            getProcessorIds(idProcessor);
         } catch (Exception ignored) {
             //do nothing
         }
@@ -111,14 +121,36 @@ public class IdClient {
     /**
      * 缓存ID
      */
-    public void cache(List<Long> ids) {
+    private void cache(List<Long> ids) {
         if (ids != null && !ids.isEmpty()) {
             for (Long id : ids) {
                 idQueue.offer(id);
             }
         }
         isExpanding.set(false);
-        LOGGER.info("拉取ID数据：[{}]", ids);
+        LOGGER.debug("拉取ID数据：[{}]", ids);
+    }
+
+    private void getProcessorIds(IdProcessor idProcessor) {
+        long startTime = System.currentTimeMillis();
+        while (true) {
+            List<Long> ids = idProcessor.getIds();
+            if (ids == null || ids.isEmpty()) {
+                try {
+                    Thread.sleep(new Random().nextInt(100));
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                if (System.currentTimeMillis() - startTime > 2000) {
+                    isExpanding.set(false);
+                    break;
+                }
+            } else {
+                cache(ids);
+                idProcessor.clearIds();
+                break;
+            }
+        }
     }
 
 }

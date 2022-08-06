@@ -7,5 +7,13 @@ id:
     connection: 127.0.0.1:2181
     sessionTimeoutMs: 10000
     connectionTimeoutMs: 10000
+
+node:
+  address: 192.168.1.228:9999,192.168.1.228:9998,192.168.1.228:9997
+
 server:
   port: 8888
+
+logging:
+  level:
+    root: debug
