@@ -3,7 +3,7 @@ package com.geega.bsc.id.client;
 import com.geega.bsc.id.client.cache.CacheConfig;
 import com.geega.bsc.id.client.network.IdProcessor;
 import com.geega.bsc.id.client.network.IdProcessorFactory;
-import com.geega.bsc.id.client.network.NodeAddressDispatch;
+import com.geega.bsc.id.client.dispatch.NodeAddressDispatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

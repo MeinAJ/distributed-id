@@ -1,5 +1,6 @@
 package com.geega.bsc.id.client.network;
 
+import com.geega.bsc.id.client.dispatch.NodeAddressDispatch;
 import com.geega.bsc.id.common.address.NodeAddress;
 import com.geega.bsc.id.common.exception.DistributedIdException;
 import com.geega.bsc.id.common.utils.AddressUtil;

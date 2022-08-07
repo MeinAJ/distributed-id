@@ -2,14 +2,15 @@ id:
   cache:
     capacity: 100
     triggerExpand: 40
-  zk:
-    namespace: id
-    connection: 127.0.0.1:2181
-    sessionTimeoutMs: 10000
-    connectionTimeoutMs: 10000
+  server:
+    zk:
+      namespace: id
+      connection: 127.0.0.1:2181
+      sessionTimeoutMs: 10000
+      connectionTimeoutMs: 10000
 
-node:
-  address: 192.168.1.228:9999,192.168.1.228:9998,192.168.1.228:9997
+#node:
+#  address: 192.168.1.228:9999,192.168.1.228:9998,192.168.1.228:9997
 
 server:
   port: 8888

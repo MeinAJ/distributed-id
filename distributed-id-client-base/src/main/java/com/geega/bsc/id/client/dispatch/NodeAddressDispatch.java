@@ -1,4 +1,4 @@
-package com.geega.bsc.id.client.network;
+package com.geega.bsc.id.client.dispatch;
 
 import com.geega.bsc.id.common.address.NodeAddress;
 
