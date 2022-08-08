@@ -53,7 +53,7 @@ public abstract class BaseAbstractServerUpdater implements ServerUpdater {
                     notify.notifyServerUpdate(nodeAddressList);
                 }
             }
-        }, serverUpdateProperties.getPollDuration(), serverUpdateProperties.getPollDuration(), TimeUnit.SECONDS);
+        }, 0, serverUpdateProperties.getPollDuration(), TimeUnit.SECONDS);
         startMonitorSever(notify);
     }
 

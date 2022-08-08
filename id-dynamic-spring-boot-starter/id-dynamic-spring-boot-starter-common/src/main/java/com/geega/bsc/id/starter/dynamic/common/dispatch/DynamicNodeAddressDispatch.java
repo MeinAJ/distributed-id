@@ -25,9 +25,9 @@ public class DynamicNodeAddressDispatch implements NodeAddressDispatch {
     private ReadWriteLock readWriteLock;
 
 
-    public DynamicNodeAddressDispatch( IRule rule, ServerUpdater serverUpdater) {
+    public DynamicNodeAddressDispatch(IRule rule, ServerUpdater serverUpdater) {
         this.rule = rule;
-        this.nodeAddresses = new ArrayList<>();
+        this.nodeAddresses = serverUpdater.pollNodeAddress();
         readWriteLock = new ReentrantReadWriteLock();
         serverUpdater.start(this::doUpdateServer);
     }

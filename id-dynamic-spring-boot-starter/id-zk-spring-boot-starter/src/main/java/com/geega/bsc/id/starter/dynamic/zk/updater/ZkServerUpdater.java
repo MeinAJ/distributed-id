@@ -43,7 +43,7 @@ public class ZkServerUpdater extends BaseAbstractServerUpdater {
             }
             return nodeAddresses;
         } catch (Exception e) {
-            log.error("zk拉取服务失败");
+            log.error("zk拉取服务失败",e);
             return null;
         }
     }

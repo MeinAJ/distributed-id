@@ -19,6 +19,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,12 +48,14 @@ public class IdAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean(NodeAddressDispatch.class)
+    @Order(Ordered.LOWEST_PRECEDENCE)
+    @ConditionalOnMissingBean
     public NodeAddressDispatch idProcessDispatchAddress(IRule rule) {
         log.debug("node address:{}", nodeAddress);
-        if ("".equals(nodeAddress.trim())) {
-            throw new IllegalArgumentException("node.address不能为空");
-        }
+        //TODO  ConditionalOnMissingBean失效
+//        if ("".equals(nodeAddress.trim())) {
+//            throw new IllegalArgumentException("node.address不能为空");
+//        }
         String[] nodeAddresses = nodeAddress.split(",");
         List<NodeAddress> nodeAddressList = new ArrayList<>();
         for (String node : nodeAddresses) {

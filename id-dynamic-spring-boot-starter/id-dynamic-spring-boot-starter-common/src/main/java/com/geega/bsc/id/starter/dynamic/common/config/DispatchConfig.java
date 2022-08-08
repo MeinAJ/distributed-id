@@ -6,6 +6,7 @@ import com.geega.bsc.id.starter.dynamic.common.dispatch.DynamicNodeAddressDispat
 import com.geega.bsc.id.starter.dynamic.common.updater.ServerUpdater;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 
 /**
@@ -14,10 +15,10 @@ import org.springframework.core.annotation.Order;
  * @date 2022/8/8 12:05 上午
  */
 @Configuration
-@Order(1)
 public class DispatchConfig {
 
     @Bean
+    @Order(Ordered.HIGHEST_PRECEDENCE)
     public NodeAddressDispatch nodeAddressDispatch(IRule rule, ServerUpdater serverUpdater) {
         return new DynamicNodeAddressDispatch(rule, serverUpdater);
     }

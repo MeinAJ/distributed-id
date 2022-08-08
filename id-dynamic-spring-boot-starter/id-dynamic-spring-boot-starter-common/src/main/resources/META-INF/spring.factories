@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.geega.bsc.id.starter.dynamic.common.config.DispatchConfig
