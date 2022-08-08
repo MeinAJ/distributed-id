@@ -1,21 +1,48 @@
 ##### 模块介绍
 
-- distributed-id-common
-
-```
-公共包
-```
-
 - distributed-id-client
 
 ```
 客户端，包含distributed-id-common模块
 ```
 
-- distributed-id-server
+- distributed-id-client-base
+```
+客户端基础借口，用来拓展
+```
+
+- distributed-id-common
 
 ```
-服务端，包含distributed-id-common模块
+公共包
+```
+
+- distributed-id-server
+  - distributed-id-server-base
+    ```
+    基础服务端,包含distributed-id-common模块
+    ```
+  - distributed-id-server-zk
+    ```
+    包含zk服务端,包含distributed-id-server-base、distributed-id-zk-common模块
+    ```
+- distributed-id-zk-common
+```
+zk公共模块
+```
+- id-dynamic-spring-boot-starter
+    - id-dynamic-spring-boot-starter-common
+      ```
+      动态获取服务基础模块，包含distributed-id-client-base模块
+      ```
+    - id-zk-spring-boot-starter
+      ```
+      zk动态服务模块 包含id-dynamic-spring-boot-starter-common模块
+      ```
+- id-server
+
+```
+基于Spring-boot-starter模块，提供HTTP方式获取ID的应用，包含distributed-id-common、distributed-id-client、id-spring-boot-starter模块
 ```
 
 - id-spring-boot-starter
@@ -24,21 +51,25 @@
 Spring-boot-starter模块，包含distributed-id-client、distributed-id-common模块
 ```
 
-- id-server
 
-```
-基于Spring-boot-starter模块，提供HTTP方式获取ID的应用，包含distributed-id-common、distributed-id-client、id-spring-boot-starter模块
-```
 
 ##### 如何集成
 
 - install id-spring-boot-starter模块到本地Maven仓库
-- pom中引入如下依赖
+- pom中引入如下依赖 (服务端用distributed-id-server-base)
 
 ```
 <dependency>
     <groupId>com.geega.cloud</groupId>
     <artifactId>id-spring-boot-starter</artifactId>
+    <version>1.0-SNAPSHOT</version>
+</dependency>
+```
+- pom中增加引用如下模块(服务端用distributed-id-server-zk)
+```
+<dependency>
+    <groupId>com.geega.cloud</groupId>
+    <artifactId>id-zk-spring-boot-starter</artifactId>
     <version>1.0-SNAPSHOT</version>
 </dependency>
 ```
@@ -51,6 +82,7 @@ private IdClient idClient;
 ```
 
 ##### 服务端参数详解
+#####  distributed-id-server-base
 
 ```
 # 服务IP
@@ -61,6 +93,10 @@ bind.port=9999
 id.datacenter=1
 # 基于NIO实现的Reactor模式时，Processor数量
 nio.processor=3
+```
+#####  distributed-id-server-zk
+多添加一下参数
+```
 # zk的连接，集群时，例子：127.0.0.1:2181，127.0.0.1:2182
 zk.connection=127.0.0.1:2181
 # zk命名空间
@@ -72,12 +108,18 @@ zk.connectionTimeoutMs=10000
 ```
 
 ##### 客户端参数详解
-
+##### id-spring-boot-starter
 ```
 # ID缓存容量个数
 id.cache.capacity=40
 # ID缓存少于triggerExpand时，会触发拉取操作，拉取数量为capacity - triggerExpand
 id.cache.triggerExpand=20
+# 服务端节点，多个节点用逗号隔开 
+node.address: 192.168.1.228:9999,192.168.1.228:9998,192.168.1.228:9997
+```
+##### id-zk-spring-boot-starter
+多添加一下参数
+```
 # zk命名空间
 id.zk.namespace=id
 # zk的连接，集群时，例子：127.0.0.1:2181，127.0.0.1:2182
@@ -87,7 +129,6 @@ id.zk.sessionTimeoutMs=10000
 # zk连接超时
 id.zk.connectionTimeoutMs=10000
 ```
-
 ##### 待办事项
 
 - ~~当客户端主动关闭连接时，服务端检测主动关闭该连接~~
@@ -112,3 +153,7 @@ id.zk.connectionTimeoutMs=10000
 - 日志优化
 - 配置多个zk，客户端配置多个zk集群，服务端自己去配置datacenter
 - 基于Netty、rpc框架实现
+- 服务上下线监听
+- @ConditionalOnMissingBean失效问题
+- 基于nacos动态配置模块
+
