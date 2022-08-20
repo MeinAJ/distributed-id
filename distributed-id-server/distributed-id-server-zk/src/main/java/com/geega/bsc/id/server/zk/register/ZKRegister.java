@@ -62,10 +62,9 @@ public class ZKRegister {
     }
 
     public void sendHearBeat() {
-        log.info("上传心跳");
         this.executorService.scheduleAtFixedRate(() -> {
             try {
-                log.info("上传心跳");
+                log.info("上传心跳,{}:{}",serverIp,serverPort);
                 zkClient.setData().forPath(ZkTreeConstant.ZK_SERVER_ROOT + ZkTreeConstant.ZK_PATH_SEPARATOR + AddressUtil.getAddress(serverIp, serverPort), ServerNode.getServerNodeDataBytes(serverIp, serverPort));
             } catch (KeeperException.NoNodeException noNodeException) {
                 //创建临时节点

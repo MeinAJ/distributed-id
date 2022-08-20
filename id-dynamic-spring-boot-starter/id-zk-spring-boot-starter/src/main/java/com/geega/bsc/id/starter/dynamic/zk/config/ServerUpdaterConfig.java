@@ -6,11 +6,10 @@ import com.geega.bsc.id.starter.dynamic.zk.properties.ZkProperties;
 import com.geega.bsc.id.starter.dynamic.zk.updater.ZkServerUpdater;
 import com.geega.bsc.id.zk.common.config.ZkConfig;
 import org.springframework.beans.BeanUtils;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
 
 /**
  * @author songminghui@naolubrain.com
@@ -22,6 +21,7 @@ import org.springframework.core.annotation.Order;
 public class ServerUpdaterConfig {
 
     @Bean
+    @ConditionalOnMissingBean
     public ServerUpdater serverUpdater(ServerUpdateProperties serverUpdateProperties, ZkProperties zkProperties) {
         ZkConfig zkConfig = new ZkConfig();
         BeanUtils.copyProperties(zkProperties, zkConfig);

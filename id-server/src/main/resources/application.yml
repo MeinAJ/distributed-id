@@ -5,7 +5,7 @@ id:
   server:
     zk:
       namespace: id
-      connection: 192.168.1.207:2181
+      connection: 192.168.1.203:2181
       sessionTimeoutMs: 10000
       connectionTimeoutMs: 10000
 

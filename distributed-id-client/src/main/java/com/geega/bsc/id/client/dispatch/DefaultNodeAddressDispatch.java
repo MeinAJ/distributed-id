@@ -1,6 +1,5 @@
 package com.geega.bsc.id.client.dispatch;
 
-import com.geega.bsc.id.client.dispatch.NodeAddressDispatch;
 import com.geega.bsc.id.client.rule.IRule;
 import com.geega.bsc.id.common.address.NodeAddress;
 import lombok.extern.slf4j.Slf4j;

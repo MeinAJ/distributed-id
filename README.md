@@ -154,6 +154,6 @@ id.zk.connectionTimeoutMs=10000
 - 配置多个zk，客户端配置多个zk集群，服务端自己去配置datacenter
 - 基于Netty、rpc框架实现
 - 服务上下线监听
-- @ConditionalOnMissingBean失效问题
+- ~~@ConditionalOnMissingBean失效问题~~
 - 基于nacos动态配置模块
 

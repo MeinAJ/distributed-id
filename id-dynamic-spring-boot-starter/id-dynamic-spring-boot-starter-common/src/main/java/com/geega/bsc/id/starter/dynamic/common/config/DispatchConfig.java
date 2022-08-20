@@ -4,10 +4,9 @@ import com.geega.bsc.id.client.dispatch.NodeAddressDispatch;
 import com.geega.bsc.id.client.rule.IRule;
 import com.geega.bsc.id.starter.dynamic.common.dispatch.DynamicNodeAddressDispatch;
 import com.geega.bsc.id.starter.dynamic.common.updater.ServerUpdater;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
 
 /**
  * @author songminghui@naolubrain.com
@@ -18,7 +17,7 @@ import org.springframework.core.annotation.Order;
 public class DispatchConfig {
 
     @Bean
-    @Order(Ordered.HIGHEST_PRECEDENCE)
+    @ConditionalOnMissingBean
     public NodeAddressDispatch nodeAddressDispatch(IRule rule, ServerUpdater serverUpdater) {
         return new DynamicNodeAddressDispatch(rule, serverUpdater);
     }
